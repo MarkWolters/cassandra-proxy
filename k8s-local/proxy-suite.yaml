@@ -131,40 +131,40 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dynamo-cass-proxy-ext-lb
+  name: cql-cass-proxy-ext-lb
   labels:
-    app: dynamo-cass-proxy
+    app: cql-cass-proxy
 spec:
   type: LoadBalancer
   ports:
   - port: 8080
     name: port-8080
   selector:
-    app: dynamo-cass-proxy 
+    app: cql-cass-proxy
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dynamo-cass-proxy
+  name: cql-cass-proxy
   labels:
-    app: dynamo-cass-proxy 
+    app: cql-cass-proxy
 spec:
   ports:
   - port: 8080
     name: port-8080
   clusterIP: None
   selector:
-    app: dynamo-cass-proxy
+    app: cql-cass-proxy
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: dynamo-cass-proxy
+  name: cql-cass-proxy
 spec:
   selector:
     matchLabels:
-      app: dynamo-cass-proxy
-  serviceName: "dynamo-cass-proxy"
+      app: cql-cass-proxy
+  serviceName: "cql-cass-proxy"
   replicas: 1
   podManagementPolicy: OrderedReady
   updateStrategy:
@@ -172,12 +172,12 @@ spec:
   template:
     metadata:
       labels:
-        app: dynamo-cass-proxy
+        app: cql-cass-proxy
     spec:
       containers:
-      - name: dynamo-cass-proxy
-        image: phact/dynamo-cassandra-proxy
-        command: ['/bin/sh', '-c', 'java -Ddw.contactPoints="cassandra" -cp /opt/dynamo-cassandra-proxy/dynamodb-cassandra-proxy-0.1.0.jar com.datastax.powertools.dcp.DCProxyApplication server /opt/dynamo-cassandra-proxy/dynamo-cassandra-proxy.yaml']
+      - name: cql-cass-proxy
+        image: phact/cql-cassandra-proxy
+        command: ['/bin/sh', '-c', 'java -Ddw.contactPoints="cassandra" -cp /opt/cql-cassandra-proxy/cql-cassandra-proxy-0.1.0.jar com.datastax.powertools.dcp.ProxyApplication server /opt/cql-cassandra-proxy/cql-cassandra-proxy.yaml']
         imagePullPolicy: IfNotPresent
         resources:
 #          requests:
@@ -187,4 +187,4 @@ spec:
         - containerPort: 8080
           name: port-8080
 #        configMap:
-#          name: dynamo-cass-proxy-config
+#          name: cql-cass-proxy-config

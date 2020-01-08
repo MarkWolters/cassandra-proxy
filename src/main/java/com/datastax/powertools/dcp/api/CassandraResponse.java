@@ -15,39 +15,37 @@
  */
 package com.datastax.powertools.dcp.api;
 
-import com.amazonaws.AmazonWebServiceResult;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
 
-public class DynamoDBResponse {
+public class CassandraResponse {
 
+    private ResultSet result;
+    public void setResult(ResultSet result) {
+        this.result = result;
+    }
+    public ResultSet getResult() {
+        return result;
+    }
 
     private String error;
-    private final int statusCode;
-    private AmazonWebServiceResult result;
-
+    public void setError(String error) {
+        this.error = error;
+    }
     public boolean hasError(){
         return error != null;
     }
     public String getError() {
         return error;
     }
+
+    private final int statusCode;
     public int getStatusCode() {
         return statusCode;
     }
 
-    public AmazonWebServiceResult getResult() {
-        return result;
-    }
-
-    public void setResult(AmazonWebServiceResult result) {
-        this.result = result;
-    }
-
-    public DynamoDBResponse(AmazonWebServiceResult result, int statusCode) {
+    public CassandraResponse(ResultSet result, int statusCode) {
         this.result = result;
         this.statusCode = statusCode;
     }
 
-    public void setError(String error) {
-        this.error = error;
-    }
 }
