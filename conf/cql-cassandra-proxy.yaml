@@ -2,14 +2,14 @@ contactPoints: localhost
 dockerCassandra: false
 cqlPort: 9042
 localDC: dc1
-cqlUserName: cassandra
-cqlPassword: cassandra
-keyspaceName: dynamoks
+#cqlUserName: cassandra
+#cqlPassword: cassandra
+keyspaceName: tmobile
 clusterName: Test Cluster
 dualCqlPort: 9042
 dualContactPoints: localhost
 dualLocalDC: dc1
-dualCqlUserName:
-dualCqlPassword:
-dualKeyspaceName:
-dualClusterName:
+#dualCqlUserName:
+#dualCqlPassword:
+dualKeyspaceName: tmobile2
+dualClusterName: Test Cluster

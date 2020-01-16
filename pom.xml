@@ -100,15 +100,6 @@
             <release>${java.version}</release>
           </configuration>
         </plugin>
-<!--
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.18.1</version>
-          <configuration>
-            <argLine>-Dsqlite4java.library.path=${basedir}/target/dependencies</argLine>
-          </configuration>
-        </plugin>
--->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>

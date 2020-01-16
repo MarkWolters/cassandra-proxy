@@ -15,7 +15,9 @@
  */
 package com.datastax.powertools.dcp.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.powertools.dcp.CqlProxyLogic;
 import com.datastax.powertools.dcp.api.CassandraResponse;
 import com.datastax.powertools.dcp.managed.dse.CassandraManager;
@@ -30,9 +32,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Iterator;
 import java.util.UUID;
 
-@Path("/")
+@Path("/proxy")
 @Produces(MediaType.APPLICATION_JSON)
 public class ProxyResource {
 
@@ -45,41 +48,51 @@ public class ProxyResource {
         this.cdt = cdt;
     }
 
-    @POST
-    @ManagedAsync
-    @Consumes("text/plain")
-    @Produces("application/json")
-    public void asyncRequestHandler(@Suspended final AsyncResponse asyncResponse, @Context HttpHeaders headers, @HeaderParam("action") String action, String payload) {
-        //TODO: This should have a bunch of different methods split out by transaction type
-        // For now it's basically a pass-through
+    //TODO: Make methods async
+    //TODO: Fix logging
+    //TODO: handle various error conditions
+
+    @GET
+    @Timed
+    public CassandraResponse queryCassandra(@QueryParam("query") String query) {
         CassandraResponse response = null;
         UUID txId = UUID.randomUUID();
         try {
             logger.info("Executing transaction %s", txId.toString());
-            if (action.equalsIgnoreCase("WRITE")) {
-                cdt.write(payload);
-                response = new CassandraResponse(null, 200);
-            } else if (action.equalsIgnoreCase("READ")) {
-                ResultSet rs = cdt.read(payload);
-                response = new CassandraResponse(rs, 200);
+            logger.debug(query);
+            ResultSet rs = cdt.read(query);
+            StringBuffer SB = new StringBuffer();
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
+                SB.append(it.next().getFormattedContents());
             }
+            response = new CassandraResponse(SB.toString(), 200);
             logger.info("Transaction %s completed", txId.toString());
         } catch (Throwable e) {
             logger.error("Throwable caught for transaction %s", txId.toString());
             logger.error(e.getMessage(), e.getStackTrace());
+            response = new CassandraResponse(null, 500);
         }
-        finally {
-            //TODO: Just throwing any error into the "500" bucket for now...
-            if (response == null) {
-                throw new WebApplicationException("Internal Error", 500);
-            } else if (response.getStatusCode() == 200) {
-                Response httpResponse;
-                Response.ResponseBuilder responseBuilder = Response.ok(response.getResult()).status(response.getStatusCode());
-                httpResponse = responseBuilder.build();
-                asyncResponse.resume(httpResponse);
-            } else {
-                throw new WebApplicationException(response.getError(), response.getStatusCode());
-            }
-        }
+        return response;
     }
+
+    @POST
+    @Timed
+    public CassandraResponse writeCassandra(String query) {
+        CassandraResponse response = null;
+        UUID txId = UUID.randomUUID();
+        try {
+            logger.info("Executing transaction %s", txId.toString());
+            logger.debug(query);
+            cdt.write(query);
+            response = new CassandraResponse(null, 200);
+            logger.info("Transaction %s completed", txId.toString());
+        } catch (Throwable e) {
+            logger.error("Throwable caught for transaction %s", txId.toString());
+            logger.error(e.getMessage(), e.getStackTrace());
+            response = new CassandraResponse(null, 500);
+        }
+        return response;
+    }
+
 }
