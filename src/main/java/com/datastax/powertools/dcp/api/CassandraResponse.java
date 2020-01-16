@@ -18,15 +18,6 @@ package com.datastax.powertools.dcp.api;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 
 public class CassandraResponse {
-/*
-    private ResultSet result;
-    public void setResult(ResultSet result) {
-        this.result = result;
-    }
-    public ResultSet getResult() {
-        return result;
-    }
-*/
 
     private String result;
     public void setResult(String result) {

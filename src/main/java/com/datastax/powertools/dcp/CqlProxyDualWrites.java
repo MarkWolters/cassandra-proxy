@@ -46,16 +46,16 @@ public class CqlProxyDualWrites extends CqlProxyLogic {
 
     @Override
     public ResultSet read(String statement) throws IOException {
-        logger.debug("Executing statement %s", statement);
+        logger.debug(String.format("Executing statement %s", statement));
         ResultSet result = cassandraManager.getSession().execute(statement);
         return result;
     }
 
     @Override
     public void write(String statement) throws IOException {
-        logger.debug("Executing statement %s in cluster %s", statement, configuration.getClusterName());
+        logger.debug(String.format("Executing statement %s in cluster %s", statement, configuration.getClusterName()));
         cassandraManager.getSession().executeAsync(statement);
-        logger.debug("Executing statement %s in cluster %s", statement, otherConfiguration.getClusterName());
+        logger.debug(String.format("Executing statement %s in cluster %s", statement, otherConfiguration.getClusterName()));
         otherCassandraManager.getSession().executeAsync(statement);
     }
 

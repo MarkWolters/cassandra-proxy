@@ -49,7 +49,6 @@ public class ProxyResource {
     }
 
     //TODO: Make methods async
-    //TODO: Fix logging
     //TODO: handle various error conditions
 
     @GET
@@ -58,7 +57,7 @@ public class ProxyResource {
         CassandraResponse response = null;
         UUID txId = UUID.randomUUID();
         try {
-            logger.info("Executing transaction %s", txId.toString());
+            logger.info(String.format("Executing transaction %s", txId.toString()));
             logger.debug(query);
             ResultSet rs = cdt.read(query);
             StringBuffer SB = new StringBuffer();
@@ -67,9 +66,9 @@ public class ProxyResource {
                 SB.append(it.next().getFormattedContents());
             }
             response = new CassandraResponse(SB.toString(), 200);
-            logger.info("Transaction %s completed", txId.toString());
+            logger.info(String.format("Transaction: %s completed", txId.toString()));
         } catch (Throwable e) {
-            logger.error("Throwable caught for transaction %s", txId.toString());
+            logger.error(String.format("Throwable caught for transaction %s", txId.toString()));
             logger.error(e.getMessage(), e.getStackTrace());
             response = new CassandraResponse(null, 500);
         }
@@ -82,13 +81,13 @@ public class ProxyResource {
         CassandraResponse response = null;
         UUID txId = UUID.randomUUID();
         try {
-            logger.info("Executing transaction %s", txId.toString());
+            logger.info(String.format("Executing transaction %s", txId.toString()));
             logger.debug(query);
             cdt.write(query);
             response = new CassandraResponse(null, 200);
-            logger.info("Transaction %s completed", txId.toString());
+            logger.info(String.format("Transaction %s completed", txId.toString()));
         } catch (Throwable e) {
-            logger.error("Throwable caught for transaction %s", txId.toString());
+            logger.error(String.format("Throwable caught for transaction %s", txId.toString()));
             logger.error(e.getMessage(), e.getStackTrace());
             response = new CassandraResponse(null, 500);
         }
